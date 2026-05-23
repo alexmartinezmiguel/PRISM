@@ -1,0 +1,25 @@
+# Model/HF cache
+hf_cache/
+
+# Data and model checkpoints (not part of the repo)
+data/
+mind_output/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Results (optional — remove if you want to include them)
+results/
+
+# OS
+.DS_Store

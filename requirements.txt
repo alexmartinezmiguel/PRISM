@@ -1,0 +1,18 @@
+# specific dependencies for recommenders
+setuptools
+wheel
+packaging
+Cython==0.29.36
+scikit-surprise==1.1.3 --only-binary=all
+typing_extensions
+scikit-learn
+pandas
+pyyaml
+tqdm
+retrying
+nltk
+# TensorFlow with bundled CUDA runtime (2.10.0)
+tensorflow[and-cuda]==2.12.0
+# visualisation
+matplotlib
+seaborn

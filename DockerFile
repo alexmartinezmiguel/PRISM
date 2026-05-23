@@ -1,0 +1,49 @@
+# Use the official TensorFlow GPU base image
+FROM tensorflow/tensorflow:2.14.0-gpu
+
+# Create a non-root user
+ARG USERNAME=ubuntu
+ARG USER_UID=1001
+ARG USER_GID=$USER_UID
+
+# Install sudo and add user previously created
+RUN apt-get update \
+    && apt-get install -y sudo \
+    && groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# copy requirements.txt to tmp directory
+COPY requirements.txt /tmp/requirements.txt
+COPY llm_requirements.txt /tmp/llm_requirements.txt
+
+# Set the working directory
+WORKDIR /workspace
+
+# Upgrade pip
+RUN pip install --upgrade pip
+# Install dependencies
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+# Install recommenders without dependencies
+RUN pip install --no-deps recommenders[gpu]
+# Install torch and transformers
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+RUN pip install --no-cache-dir -r /tmp/llm_requirements.txt
+# Install Python dependencies
+RUN pip install jupyterlab ipykernel notebook
+
+# Set the timezone (optional)
+ENV TZ=UTC
+
+# Configure shell prompt for the container user
+RUN echo 'export PS1="\u@\h (\$(date +%H:%M)):\w\$ "' >> /home/$USERNAME/.bashrc
+
+# Make sure ubuntu user owns the workspace directory (to avoid permission errors in host machine)
+RUN chown -R $USERNAME:$USERNAME /workspace
+
+# Switch to non-root user
+USER $USERNAME
+
+# Shell
+CMD ["/bin/bash"]
